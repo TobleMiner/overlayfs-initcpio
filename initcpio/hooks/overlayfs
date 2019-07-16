@@ -1,0 +1,53 @@
+#!/bin/ash
+
+run_hook() {
+  if [ -n "$overlayrw" ]; then
+    echo ":: overlayrw set, using overlayfs as rootfs"
+    mount_handler=overlay_mount_handler
+  fi
+}
+
+bail_out() {
+  echo "You are now being dropped into an emergency shell."
+  launch_interactive_shell
+  msg "Trying to continue (this will most likely fail) ..."
+}
+
+ensure_mountpoint() {
+  if ! [ -e "$1" ]; then
+    echo ":: Mountpoint '$1' does not exist, creating"
+    mkdir "$1" || bail_out
+  fi
+}
+
+overlay_mount_handler() {
+  mountpoint="$1"
+
+  # Create mountpoints
+  ensure_mountpoint /rom
+  ensure_mountpoint /flash
+
+
+  echo ":: Mounting ro base fs from '$root'"
+  if ! mount ${rootfstype:+-t $rootfstype} -o ro${rootflags:+,$rootflags} "$root" /rom; then
+    echo "Failed to mount readonly base on /rom"
+    bail_out
+  fi
+
+  overlayrwdev=$(resolve_device "$overlayrw") && overlayrw="$overlayrwdev"
+  echo ":: Mounting rw overlay fs from '$overlayrwdev'"
+  if ! mount ${overlayrwfstype:+-t $overlayrwfstype} -o rw${overlayrwflags:+,$overlayrwflags} "$overlayrw" /flash; then
+    echo "Failed to mount readwrite overlay on /flash"
+    bail_out
+  fi
+
+  # Ensure upperdir and workdir exist
+  ensure_mountpoint /flash/upper
+  ensure_mountpoint /flash/work
+
+  echo ":: Overlaying ro and rw filesystems"
+  if ! mount -t overlay -o lowerdir=/rom,upperdir=/flash/upper,workdir=/flash/work,${rwopt:-ro}${overlayflags:+,$overlayflags} overlay "$mountpoint"; then
+    echo "Failed to overlay filesystems on $mountpoint"
+    bail_out
+  fi
+}
