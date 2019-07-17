@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-install -m 0755 initcpio/install/overlayfs /usr/lib/initcpio/install/overlayfs
-install -m 0755 initcpio/hooks/overlayfs /usr/lib/initcpio/hooks/overlayfs
+install -m 0644 initcpio/install/overlayfs /usr/lib/initcpio/install/overlayfs
+install -m 0644 initcpio/hooks/overlayfs /usr/lib/initcpio/hooks/overlayfs
