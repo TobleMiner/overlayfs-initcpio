@@ -1,5 +1,7 @@
 build() {
   add_runscript
+  add_checked_modules overlay
+  add_checked_modules squashfs
 }
 
 help() {
