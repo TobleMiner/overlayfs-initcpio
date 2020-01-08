@@ -1,8 +1,11 @@
 #!/bin/ash
 
+overlayfs_old_mount_handler=""
+
 run_hook() {
   if [ -n "$overlayrw" ]; then
     echo ":: overlayrw set, using overlayfs as rootfs"
+    overlayfs_old_mount_handler="$mount_handler"
     mount_handler=overlay_mount_handler
   fi
 }
@@ -29,8 +32,8 @@ overlay_mount_handler() {
 
 
   echo ":: Mounting ro base fs from '$root'"
-  if ! mount ${rootfstype:+-t $rootfstype} -o ro${rootflags:+,$rootflags} "$root" /rom; then
-    echo "Failed to mount readonly base on /rom"
+  if ! "$overlayfs_old_mount_handler" "/rom"; then
+    echo "Failed to mount (readonly) base on /rom"
     bail_out
   fi
 
