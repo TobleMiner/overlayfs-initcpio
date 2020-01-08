@@ -49,7 +49,7 @@ overlay_mount_handler() {
   ensure_mountpoint /flash/work
 
   echo ":: Overlaying ro and rw filesystems"
-  if ! mount -t overlay -o lowerdir=/rom,upperdir=/flash/upper,workdir=/flash/work,${rwopt:-ro}${overlayflags:+,$overlayflags} overlay "$mountpoint"; then
+  if ! mount -t overlay -o lowerdir=/rom,upperdir=/flash/upper,workdir=/flash/work,${rwopt:-rw}${overlayflags:+,$overlayflags} overlay "$mountpoint"; then
     echo "Failed to overlay filesystems on $mountpoint"
     bail_out
   fi
