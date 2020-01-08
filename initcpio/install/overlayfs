@@ -8,16 +8,13 @@ help() {
   cat <<EOF
 This hook adds the overlayfs mount option.
 Options:
- - root: The lower device, will be mounted ro
- - rootfstype: Fs type on the lower device
- - rootflags: Flags to parse to mount for lower device
  - overlayrw: The overlay device, will be mounted rw
  - overlayrwfstype: Fs type on the overlay device
  - overlayrwflags: Flags to parse to mount for overlay device
  - ro/rw: ro/rw mount overlayfs
  - overlayflags: Flags to parse to mount for overlayfs
 
-Of the above options only 'root' and 'overlayrw' are mandatory.
+Of the above options only 'overlayrw' is mandatory.
 Set root to your readonly base fs and overlayrw to your rw fs.
 Both support device selection via UUID=, LABEL=, PARTUUID=,
 PARTLABEL=, device path and hexadecimal majorminor number.
